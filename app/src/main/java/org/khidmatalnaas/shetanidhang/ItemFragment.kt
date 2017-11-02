@@ -44,6 +44,7 @@ class ItemFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_item_list, container, false)
         val listFromActivity = arguments?.getStringArrayList("titleList") ?: return null
 
+
         // Set the adapter
         if (view is RecyclerView) {
             val context = view.getContext()
