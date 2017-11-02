@@ -41,6 +41,7 @@ dependencies {
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
     compile 'uk.co.chrisjenx:calligraphy:2.3.0'
     compile 'com.jaredrummler:colorpicker:1.0.1'
+
 }
 repositories {
     mavenCentral()

@@ -14,29 +14,64 @@ import android.support.annotation.IdRes
 import android.support.annotation.Nullable
 import android.support.v4.app.Fragment
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Build
 import android.support.v7.app.AlertDialog
 import android.content.SharedPreferences
 import android.graphics.Color
 import android.preference.PreferenceManager
+import android.support.v4.content.LocalBroadcastManager
+import android.util.Log
+import android.widget.SeekBar
 import android.widget.Toast
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
 
 
-class MainActivity : AppCompatActivity(), ItemFragment.OnListFragmentInteractionListener, ColorPickerDialogListener {
+class MainActivity : AppCompatActivity(),
+        ItemFragment.OnListFragmentInteractionListener,
+        ColorPickerDialogListener,
+        SeekBar.OnSeekBarChangeListener{
+    override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
+        val edit = PreferenceManager.getDefaultSharedPreferences(this).edit()
+        edit.putInt("textSize", p1+16)
+        edit.commit()
+
+        sendMessageSettingsChanged()
+    }
+
+    override fun onStartTrackingTouch(p0: SeekBar?) {
+
+    }
+
+    override fun onStopTrackingTouch(p0: SeekBar?) {
+        mSeekbar1.visibility = View.GONE
+    }
 
 
     override fun onDialogDismissed(dialogId: Int) {
 
     }
 
+
+    // Send an Intent with an action named "custom-event-name". The Intent sent should
+// be received by the ReceiverActivity.
+    private fun sendMessageSettingsChanged() {
+        Log.d("sender", "Broadcasting message");
+        val intent =  Intent("custom-event-name");
+        // You can also include some extra data.
+        intent.putExtra("message", "This is my message!");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
     override fun onColorSelected(dialogId: Int, color: Int) {
 
-        //Toast.makeText(baseContext,"color is $color",Toast.LENGTH_SHORT).show()
+
         val edit = PreferenceManager.getDefaultSharedPreferences(this).edit()
         edit.putInt("color_foreground", color)
         edit.commit()
+        sendMessageSettingsChanged()
+
 
     }
 
@@ -65,6 +100,8 @@ class MainActivity : AppCompatActivity(), ItemFragment.OnListFragmentInteraction
         var sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
         val fontName = sharedPreferences.getString("fontName","")
         replaceFont(fontName)
+
+
 
 
     }
@@ -99,15 +136,24 @@ class MainActivity : AppCompatActivity(), ItemFragment.OnListFragmentInteraction
         // In case this activity was started with special instructions from an
         // Intent, pass the Intent's extras to the fragment as arguments
         val bundle = Bundle()
-        bundle.putStringArrayList("titleList",mdb?.getAllTitlesFromTableBook1() ?: dummyArray)
+        bundle.putStringArrayList("titleList", mdb?.getAllTitlesFromTableBook1() ?: dummyArray)
         itemFrag.arguments = bundle
 
         // Add the fragment to the 'fragment_container' FrameLayout
 
-        addFragment(R.id.fragmentContainer,itemFrag,"Item Frag")
+        addFragment(R.id.fragmentContainer, itemFrag, "Item Frag")
+
+        mSeekbar1.setOnSeekBarChangeListener(this)
 
 
     }
+
+
+
+
+
+
+
 
     protected fun addFragment(@IdRes containerViewId: Int,
                               fragment: Fragment,
@@ -175,6 +221,9 @@ class MainActivity : AppCompatActivity(), ItemFragment.OnListFragmentInteraction
                    replaceFont(fontNames[which].toString())
 
 
+                   sendMessageSettingsChanged()
+
+
                })
                val dlg = alert.create()
                // Here you can change the layout direction via setLayoutDirection()
@@ -188,11 +237,14 @@ class MainActivity : AppCompatActivity(), ItemFragment.OnListFragmentInteraction
 
            2->{
 
+               mSeekbar1.visibility = View.VISIBLE
+
                return true
            }
 
            3->{
                ColorPickerDialog.newBuilder().setColor(Color.BLACK).show(this)
+
 
                return true
            }

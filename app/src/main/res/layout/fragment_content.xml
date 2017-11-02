@@ -9,7 +9,9 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+
+        >
         <TextView
             android:id="@+id/cf_tv_content"
             android:layout_width="match_parent"
@@ -18,4 +20,6 @@
             android:textIsSelectable="true"
             />
     </ScrollView>
+
+
 </LinearLayout>
